@@ -1,0 +1,33 @@
+# 建立服务
+
+torch-model-archiver --model-name BERT4NILM --version 1.0 --serialized-file ap/BERT4NILM.pt --handler ap/NILMHandler.py --export-path ap/ --extra-files ./  --force
+
+torchserve --start --model-store ap/ --models ap/BERT4NILM.mar --ts-config ap/config.properties --ncs
+
+
+# requirest测试
+
+import json
+import numpy as np
+list_data = np.random.randn(1,480).tolist()
+# json_data = json.dumps(list_data)
+
+import requests
+
+# 请求数据和 API 路径
+data = {"input": list_data[0]}
+url = "http://localhost:8080/predictions/BERT4NILM"
+json_data = json.dumps(data)
+
+# 发送 POST 请求到 TorchServe 的 API 路径
+response = requests.post(url, json=json_data)
+
+# 处理响应
+if response.status_code == 200:
+    result = response.json()
+    # 处理结果
+    print(result)
+else:
+    print("API request failed with status code:", response.status_code)
+
+

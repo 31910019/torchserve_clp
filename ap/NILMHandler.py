@@ -1,16 +1,31 @@
 import torch
 from ts.torch_handler.base_handler import BaseHandler
 import json
-
+import logging
 class NILMHandler(BaseHandler):
+    def __init__(self):
+        super(NILMHandler, self).__init__()
+    
     def preprocess(self, input):
         # 在此处对输入数据进行预处理
         # 这里假设输入数据是包含表格数据的列表
-        print(input)
+        payload = {}
+        logging.info(f"Receiving new data:{input}")
+
+        payload["invalid_request"] = False
+        try:
+            req = input[0].get("body")
+            req = json.loads(req)
+            data = req.get("input", None)
+            logging.info("Received x: {}".format(data))
+        except Exception as e:
+            logging.info(f"Bad request...{e}")
+
+        logging.info(
+            f'''Going to inference - data: {data}'])''')
         mean = 5
         std = 3
         window_size = 480
-        data = json.loads(input)['input']
         data = torch.tensor(data).reshape([-1,window_size])
 
         return (data - mean) / std
@@ -39,3 +54,18 @@ class NILMHandler(BaseHandler):
 
 # torchserve --start --model-store <model_store_path> --models <model_name>=<model_version>.mar
 # torch-model-archiver --model-name BERT4NILM --version 1.0 --model-file BERT4NILM.py --serialized-file BERT4NILM.pt --handler NILMHandler.py --export-path ap/
+_service = NILMHandler()
+
+
+def handle(data, context):
+    if not _service.initialized:
+        _service.initialize(context)
+
+    if data is None:
+        return None
+    data = _service.preprocess(data)
+    data = _service.inference(data)
+    data = _service.postprocess(data)
+    logging.info(f"Returning data: {data}")
+
+    return data
