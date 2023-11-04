@@ -1,0 +1,41 @@
+{
+  "modelConfigVersions": [
+    {
+      "modelName": "BERT4NILM",
+      "modelVersion": "1.0",
+      "modelFile": "ap/BERT4NILM.mar",
+      "serializedFile": "ap/BERT4NILM.pt",
+      "handler": "ap/NILMHandler",
+      "modelType": "pytorch"
+    }
+  ],
+  "modelEndpoints": {
+    "my_model_endpoint": {
+      "modelName": "BERT4NILM",
+      "modelVersion": "1.0",
+      "handler": "ap/NILMHandler",
+      "route": "/api/BERT4NILM",
+      "model-file": "ap/BERT4NILM.pt",
+      "batchSize": 1,
+      "maxBatchDelay": 100,
+      "workers": 1,
+        "model_config": {
+    "args": {
+      "seed": "12345",
+      "sampling": "6s",
+      "window_size": "480",
+      "window_stride": "120",
+      "output_size": "1",
+      "drop_out": "0.1",
+      "mask_prob": "0.25",
+      "lr": "1e-6",
+      "weight_decay": "0",
+      "decay_step": "100",
+      "gamma": "0.1",
+      "num_epochs": "100",
+      "method": 'ALAD'
+    }
+  }
+    }
+  }
+}
