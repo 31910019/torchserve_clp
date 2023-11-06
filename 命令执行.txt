@@ -4,19 +4,21 @@ torch-model-archiver --model-name BERT4NILM --version 1.0 --serialized-file ap/B
 
 torchserve --start --model-store ap/ --models ap/BERT4NILM.mar --ts-config ap/config.properties --ncs
 
-
+url2 = "localhost:8081/models?model_name=BERT4NILM&url=BERT4NILM.mar&initial_workers=1"
+curl -X POST urls
 # requirest测试
 
 import json
 import numpy as np
-list_data = np.random.randn(1,480).tolist()
+list_data = np.random.randn(1,144).tolist()
 # json_data = json.dumps(list_data)
 
 import requests
+import json
 
 # 请求数据和 API 路径
 data = {"input": list_data[0]}
-url = "http://localhost:8080/predictions/BERT4NILM"
+url = "localhost:8080/predictions/BERT4NILM"
 json_data = json.dumps(data)
 
 # 发送 POST 请求到 TorchServe 的 API 路径
@@ -29,5 +31,9 @@ if response.status_code == 200:
     print(result)
 else:
     print("API request failed with status code:", response.status_code)
+
+
+
+
 
 
