@@ -4,6 +4,13 @@ torch-model-archiver --model-name BERT4NILM --version 1.0 --serialized-file ap/B
 
 torchserve --start --model-store ap/ --models ap/BERT4NILM.mar --ts-config ap/config.properties --ncs
 
+lsof -i :8090 | awk '{ print $2; }' | head -n 2 | grep -v PID | xargs kill -9
+lsof -i :8091 | awk '{ print $2; }' | head -n 2 | grep -v PID | xargs kill -9
+lsof -i :9000 | awk '{ print $2; }' | head -n 2 | grep -v PID | xargs kill -9
+lsof -i :9001 | awk '{ print $2; }' | head -n 2 | grep -v PID | xargs kill -9
+docker run --rm -it -p 0.0.0.0:8080:8080 -p 0.0.0.0:8081:8081 -p 0.0.0.0:8082:8082 -v $(pwd)/ap:/home/model-server/model-store pytorch/torchserve:latest-cpu
+sleep 2s
+curl -X POST "localhost:8081/models?model_name=BERT4NILM&url=BERT4NILM.mar&initial_workers=1"
 url2 = "localhost:8081/models?model_name=BERT4NILM&url=BERT4NILM.mar&initial_workers=1"
 curl -X POST urls
 # requirest测试

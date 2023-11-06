@@ -42,7 +42,7 @@ class NILMHandler(BaseHandler):
         #     input_tensor[i] = torch.tensor(item)  # 将表格数据转换为张量
 
         # 使用预训练模型进行推断
-        output = self.model(data.to('cuda:0'))
+        output = self.model(data.to(self.device))
 
         return output.reshape(-1,self.window_size)
 
