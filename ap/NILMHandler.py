@@ -10,23 +10,23 @@ class NILMHandler(BaseHandler):
         # 在此处对输入数据进行预处理
         # 这里假设输入数据是包含表格数据的列表
         payload = {}
-        logging.info(f"Receiving new data:{input}")
+        logging.info('Receiving new data')
 
         payload["invalid_request"] = False
         try:
             req = input[0].get("body")
             req = json.loads(req)
             data = req.get("input", None)
-            logging.info("Received x: {}".format(data))
+            # logging.info("Received x: {}".format(data))
         except Exception as e:
             logging.info(f"Bad request...{e}")
 
-        logging.info(
-            f'''Going to inference - data: {data}'])''')
+        # logging.info(
+            # f'''Going to inference - data: {data}'])''')
         mean = 5
         std = 3
-        window_size = 480
-        data = torch.tensor(data).reshape([-1,window_size])
+        self.window_size = 144
+        data = torch.tensor(data).reshape([-1,self.window_size])
 
         return (data - mean) / std
 
@@ -42,15 +42,15 @@ class NILMHandler(BaseHandler):
         #     input_tensor[i] = torch.tensor(item)  # 将表格数据转换为张量
 
         # 使用预训练模型进行推断
-        output = self.model(data)
+        output = self.model(data.to('cuda:0'))
 
-        return output.tolist()
+        return output.reshape(-1,self.window_size)
 
     def postprocess(self, data):
         # 在此处对推断结果进行后处理
         # 这里简单地返回推断结果
-        print(data)
-        return json.dumps({'result': data.detach().numpy().tolist()[0]})
+        print(type(data))
+        return data.cpu().detach().numpy().tolist()
 
 # torchserve --start --model-store <model_store_path> --models <model_name>=<model_version>.mar
 # torch-model-archiver --model-name BERT4NILM --version 1.0 --model-file BERT4NILM.py --serialized-file BERT4NILM.pt --handler NILMHandler.py --export-path ap/
