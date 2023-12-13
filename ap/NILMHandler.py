@@ -50,7 +50,10 @@ class NILMHandler(BaseHandler):
         # 在此处对推断结果进行后处理
         # 这里简单地返回推断结果
         print(type(data))
-        return data.cpu().detach().numpy().tolist()
+        dict = {}
+        dict['appliance'] = 'refrigerator'
+        dict['result'] = str(data.cpu().detach().numpy().tolist())[1:-1]
+        return [json.dumps(dict)]
 
 # torchserve --start --model-store <model_store_path> --models <model_name>=<model_version>.mar
 # torch-model-archiver --model-name BERT4NILM --version 1.0 --model-file BERT4NILM.py --serialized-file BERT4NILM.pt --handler NILMHandler.py --export-path ap/
