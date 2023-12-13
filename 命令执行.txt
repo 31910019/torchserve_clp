@@ -25,7 +25,7 @@ import json
 
 # 请求数据和 API 路径
 data = {"input": list_data[0]}
-url = "localhost:8080/predictions/BERT4NILM"
+url = "http://localhost:8080/predictions/BERT4NILM"
 json_data = json.dumps(data)
 
 # 发送 POST 请求到 TorchServe 的 API 路径
